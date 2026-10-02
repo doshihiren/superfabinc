@@ -1,0 +1,9 @@
+*
+!*/
+!*.html
+!*.css
+!*.js
+!.gitignore
+wp-admin/
+wp-content/
+wp-includes/
