@@ -7,3 +7,5 @@
 wp-admin/
 wp-content/
 wp-includes/
+!sitemap.xml
+!robots.txt
