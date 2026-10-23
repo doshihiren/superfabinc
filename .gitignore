@@ -3,9 +3,13 @@
 !*.html
 !*.css
 !*.js
+!*.php
+!*.htaccess
 !.gitignore
 wp-admin/
 wp-content/
 wp-includes/
+chat/data/
+chat/config.local.php
 !sitemap.xml
 !robots.txt

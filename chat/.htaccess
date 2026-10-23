@@ -1,0 +1,10 @@
+Options -Indexes
+
+<FilesMatch "^(config\.local\.php|.*\.(sqlite|db|json))$">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule ^data/ - [F,L]
+</IfModule>

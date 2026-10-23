@@ -1,0 +1,20 @@
+<?php
+declare(strict_types=1);
+session_start();
+require __DIR__.'/lib.php';
+$cfg=sf_config();
+
+if(isset($_GET['logout'])){session_destroy();header('Location: admin.php');exit;}
+if(empty($_SESSION['sfchat_admin'])){
+    $err='';
+    if($_SERVER['REQUEST_METHOD']==='POST'){
+        $pass=(string)($_POST['password']??'');
+        if($cfg['admin_password']!=='' && hash_equals((string)$cfg['admin_password'],$pass)){$_SESSION['sfchat_admin']=true;header('Location: admin.php');exit;}
+        $err='Invalid password.';
+    }
+    ?><!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Superfab Chat Admin</title><style>body{font-family:Arial;background:#f5f7fa;display:grid;place-items:center;height:100vh;margin:0}.box{background:#fff;padding:28px;border-radius:14px;box-shadow:0 12px 35px #0002;width:min(360px,85vw)}input,button{box-sizing:border-box;width:100%;padding:12px;margin-top:10px;border-radius:9px;border:1px solid #ccd5df}button{background:#0e77bc;color:#fff;border:0;font-weight:700}</style></head><body><form class="box" method="post"><h2>Superfab Chat Admin</h2><?php if($cfg['admin_password']===''):?><p>Set <code>SUPERFAB_CHAT_ADMIN_PASSWORD</code> or add it to <code>config.local.php</code> first.</p><?php else:?><input type="password" name="password" placeholder="Admin password" autofocus><button>Login</button><p style="color:#c00"><?=htmlspecialchars($err)?></p><?php endif;?></form></body></html><?php exit;
+}
+$rows=sf_list_conversations();$selected=preg_replace('/[^a-zA-Z0-9_-]/','',(string)($_GET['session']??''));$msgs=$selected?sf_conversation_messages($selected):[];
+?><!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Superfab Chat Admin</title><style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial;color:#1f2937;background:#f6f8fb}.top{background:#0e77bc;color:#fff;padding:16px 22px;display:flex;justify-content:space-between;align-items:center}.top a{color:#fff}.layout{display:grid;grid-template-columns:390px 1fr;min-height:calc(100vh - 58px)}.list{background:#fff;border-right:1px solid #e5e7eb;overflow:auto}.item{display:block;padding:15px 18px;border-bottom:1px solid #eef1f4;color:inherit;text-decoration:none}.item:hover,.item.active{background:#eef7fd}.name{font-weight:700}.meta{font-size:12px;color:#6b7280;margin-top:5px}.chat{padding:22px;overflow:auto}.empty{color:#6b7280}.msg{max-width:760px;padding:12px 14px;border-radius:12px;margin:10px 0;background:#fff;border:1px solid #e5e7eb}.msg.user{margin-left:auto;background:#0e77bc;color:#fff;border:0}.msg small{display:block;opacity:.7;margin-top:7px}.stats{font-size:13px;opacity:.9}@media(max-width:760px){.layout{grid-template-columns:1fr}.list{max-height:40vh;border-right:0;border-bottom:1px solid #ddd}}
+</style></head><body><div class="top"><div><strong>Superfab Chat Admin</strong> <span class="stats">• <?=count($rows)?> conversations • <?=sf_sqlite()?'SQLite':'JSON fallback'?></span></div><a href="?logout=1">Logout</a></div><div class="layout"><aside class="list"><?php foreach($rows as $c):$sid=$c['session_id']??($c['sid']??'');?><a class="item <?=$selected===$sid?'active':''?>" href="?session=<?=urlencode($sid)?>"><div class="name"><?=htmlspecialchars($c['name']??'')?> — <?=htmlspecialchars($c['mobile']??'')?></div><div class="meta"><?=htmlspecialchars($c['status']??'New')?> • <?=htmlspecialchars($c['updated_at']??'')?></div><div class="meta"><?=htmlspecialchars($c['source_url']??'')?></div></a><?php endforeach;?></aside><main class="chat"><?php if(!$selected):?><div class="empty">Select a conversation to view the complete chat.</div><?php else: foreach($msgs as $m):?><div class="msg <?=($m['role']??'')==='user'?'user':''?>"><?=nl2br(htmlspecialchars($m['message']??''))?><small><?=htmlspecialchars($m['role']??'')?> • <?=htmlspecialchars($m['created_at']??'')?><?php if(!empty($m['source_url'])):?> • <?=htmlspecialchars($m['source_url'])?><?php endif;?></small></div><?php endforeach; endif;?></main></div></body></html>

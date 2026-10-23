@@ -316,3 +316,13 @@
     }
   });
 })();
+
+/* Superfab AI chat pilot: keep limited to one inner page until approved. */
+(function () {
+  var path = (location.pathname || "").toLowerCase().replace(/\/+$/, "");
+  if (path !== "/cable-tray-manufacturer-in-india" && path !== "/cable-tray-manufacturer-in-india.html") return;
+  var s = document.createElement("script");
+  s.src = "/chat/widget.js?v=1";
+  s.defer = true;
+  document.head.appendChild(s);
+})();
